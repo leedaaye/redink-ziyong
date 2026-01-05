@@ -314,7 +314,18 @@ onMounted(async () => {
     // onStreamError
     (err) => {
       console.error('Stream Error:', err)
-      error.value = '生成失败: ' + err.message
+      error.value = '网络错误: ' + err.message + '（可点击重试失败的图片）'
+
+      // 将所有正在生成的图片标记为错误状态
+      store.images.forEach(img => {
+        if (img.status === 'generating') {
+          store.updateProgress(img.index, 'error', undefined, '网络连接中断')
+        }
+      })
+
+      // 结束生成状态，允许重试
+      store.progress.status = 'done'
+      store.stage = 'result'
     },
     // userImages - 用户上传的参考图片
     store.userImages.length > 0 ? store.userImages : undefined,
