@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}API 配置 - 红墨管理后台{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>文本生成配置</h2>
+    <p style="color: #666; margin-bottom: 16px;">用于生成小红书图文大纲</p>
+
+    {% if text_config.providers %}
+    <form method="POST" action="{{ url_for('admin.save_text_config') }}">
+        <div class="form-group">
+            <label>当前激活服务商</label>
+            <select name="active_provider" class="form-select">
+                {% for name in text_config.providers.keys() %}
+                <option value="{{ name }}" {% if name == text_config.active_provider %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% for name, provider in text_config.providers.items() %}
+        <div class="provider-card {% if name == text_config.active_provider %}active{% endif %}">
+            <div class="provider-header">
+                <h3>{{ name }} {% if name == text_config.active_provider %}<span class="badge badge-success">激活</span>{% endif %}</h3>
+                <a href="{{ url_for('admin.delete_text_provider', name=name) }}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除服务商 {{ name }} 吗？')">删除</a>
+            </div>
+            <input type="hidden" name="provider_names" value="{{ name }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>类型</label>
+                    <select name="type_{{ name }}" class="form-select">
+                        <option value="google_gemini" {% if provider.type == 'google_gemini' %}selected{% endif %}>Google Gemini</option>
+                        <option value="openai_compatible" {% if provider.type == 'openai_compatible' %}selected{% endif %}>OpenAI 兼容</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>模型</label>
+                    <input type="text" name="model_{{ name }}" value="{{ provider.model or '' }}" placeholder="gemini-2.0-flash">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>API Key {% if provider.api_key %}(已配置，留空保持不变){% endif %}</label>
+                <input type="password" name="api_key_{{ name }}" value="" placeholder="{% if provider.api_key %}••••••••{% else %}请输入 API Key{% endif %}">
+            </div>
+            <div class="form-group">
+                <label>Base URL（可选）</label>
+                <input type="text" name="base_url_{{ name }}" value="{{ provider.base_url or '' }}" placeholder="https://api.openai.com/v1">
+            </div>
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">保存文本配置</button>
+    </form>
+    {% else %}
+    <p style="color: #999; margin-bottom: 16px;">暂无配置，请添加服务商</p>
+    {% endif %}
+
+    <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+    <h3 style="font-size: 16px; margin-bottom: 12px;">添加文本服务商</h3>
+    <form method="POST" action="{{ url_for('admin.add_text_provider') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>服务商名称</label>
+                <input type="text" name="name" placeholder="例如: gemini" required>
+            </div>
+            <div class="form-group">
+                <label>类型</label>
+                <select name="type" class="form-select">
+                    <option value="google_gemini">Google Gemini</option>
+                    <option value="openai_compatible">OpenAI 兼容</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>模型</label>
+                <input type="text" name="model" placeholder="gemini-2.0-flash">
+            </div>
+            <div class="form-group">
+                <label>API Key</label>
+                <input type="password" name="api_key" placeholder="请输入 API Key" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Base URL（可选）</label>
+            <input type="text" name="base_url" placeholder="https://api.openai.com/v1">
+        </div>
+        <button type="submit" class="btn btn-secondary">添加服务商</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>图片生成配置</h2>
+    <p style="color: #666; margin-bottom: 16px;">用于生成小红书配图</p>
+
+    {% if image_config.providers %}
+    <form method="POST" action="{{ url_for('admin.save_image_config') }}">
+        <div class="form-group">
+            <label>当前激活服务商</label>
+            <select name="active_provider" class="form-select">
+                {% for name in image_config.providers.keys() %}
+                <option value="{{ name }}" {% if name == image_config.active_provider %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        {% for name, provider in image_config.providers.items() %}
+        <div class="provider-card {% if name == image_config.active_provider %}active{% endif %}">
+            <div class="provider-header">
+                <h3>{{ name }} {% if name == image_config.active_provider %}<span class="badge badge-success">激活</span>{% endif %}</h3>
+                <a href="{{ url_for('admin.delete_image_provider', name=name) }}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除服务商 {{ name }} 吗？')">删除</a>
+            </div>
+            <input type="hidden" name="provider_names" value="{{ name }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>类型</label>
+                    <select name="type_{{ name }}" class="form-select">
+                        <option value="google_genai" {% if provider.type == 'google_genai' %}selected{% endif %}>Google GenAI</option>
+                        <option value="image_api" {% if provider.type == 'image_api' %}selected{% endif %}>图片 API</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>模型</label>
+                    <input type="text" name="model_{{ name }}" value="{{ provider.model or '' }}" placeholder="gemini-3-pro-image-preview">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>API Key {% if provider.api_key %}(已配置，留空保持不变){% endif %}</label>
+                <input type="password" name="api_key_{{ name }}" value="" placeholder="{% if provider.api_key %}••••••••{% else %}请输入 API Key{% endif %}">
+            </div>
+            <div class="form-group">
+                <label>Base URL（可选）</label>
+                <input type="text" name="base_url_{{ name }}" value="{{ provider.base_url or '' }}" placeholder="https://api.openai.com/v1">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="high_concurrency_{{ name }}" {% if provider.high_concurrency %}checked{% endif %}>
+                    启用高并发模式（需要 API 支持）
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">保存图片配置</button>
+    </form>
+    {% else %}
+    <p style="color: #999; margin-bottom: 16px;">暂无配置，请添加服务商</p>
+    {% endif %}
+
+    <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+    <h3 style="font-size: 16px; margin-bottom: 12px;">添加图片服务商</h3>
+    <form method="POST" action="{{ url_for('admin.add_image_provider') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>服务商名称</label>
+                <input type="text" name="name" placeholder="例如: gemini" required>
+            </div>
+            <div class="form-group">
+                <label>类型</label>
+                <select name="type" class="form-select">
+                    <option value="google_genai">Google GenAI</option>
+                    <option value="image_api">图片 API</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>模型</label>
+                <input type="text" name="model" placeholder="gemini-3-pro-image-preview">
+            </div>
+            <div class="form-group">
+                <label>API Key</label>
+                <input type="password" name="api_key" placeholder="请输入 API Key" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Base URL（可选）</label>
+            <input type="text" name="base_url" placeholder="https://api.openai.com/v1">
+        </div>
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="high_concurrency">
+                启用高并发模式
+            </label>
+        </div>
+        <button type="submit" class="btn btn-secondary">添加服务商</button>
+    </form>
+</div>
+
+<style>
+    .form-select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        background: white;
+    }
+    .form-select:focus { outline: none; border-color: #e74c3c; }
+    .provider-card {
+        background: #f8f9fa;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    .provider-card.active {
+        border-color: #e74c3c;
+        background: #fff5f5;
+    }
+    .provider-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    .provider-card h3 {
+        font-size: 16px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    @media (max-width: 600px) {
+        .form-row { grid-template-columns: 1fr; }
+    }
+    .form-group label input[type="checkbox"] {
+        margin-right: 8px;
+    }
+    hr { margin: 24px 0; }
+</style>
+{% endblock %}

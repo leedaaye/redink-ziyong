@@ -80,7 +80,7 @@ echo   [OK] 后端依赖完成
 :: 前端依赖
 echo   → 前端依赖
 cd frontend
-if not exist "node_modules\" (
+if not exist "node_modules\vite\bin\vite.js" (
     echo     正在安装前端依赖，请稍候...
     %PKG_MANAGER% install
 )
@@ -95,9 +95,9 @@ echo.
 
 :: 启动后端 (新窗口，蓝色背景)
 if %USE_UV% equ 1 (
-    start "红墨-后端-12398" cmd /k "color 1F && title 红墨 后端服务 [12398] && uv run python backend/app.py"
+    start "红墨-后端-12398" cmd /k "color 1F && title 红墨 后端服务 [12398] && uv run python -m backend.app"
 ) else (
-    start "红墨-后端-12398" cmd /k "color 1F && title 红墨 后端服务 [12398] && python backend/app.py"
+    start "红墨-后端-12398" cmd /k "color 1F && title 红墨 后端服务 [12398] && python -m backend.app"
 )
 
 :: 等待后端启动

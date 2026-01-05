@@ -1,6 +1,36 @@
 import axios from 'axios'
+import router from '../router'
+import { useAuthStore } from '../stores/auth'
 
 const API_BASE_URL = '/api'
+const TOKEN_KEY = 'redink_access_token'
+
+// Axios 请求拦截器：自动添加 Authorization 头
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem(TOKEN_KEY)
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// Axios 响应拦截器：处理 401 错误
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      const authStore = useAuthStore()
+      authStore.logout()
+      if (router.currentRoute.value.path !== '/login') {
+        router.push('/login')
+      }
+    }
+    return Promise.reject(error)
+  }
+)
 
 export interface Page {
   index: number
@@ -104,6 +134,7 @@ export async function retryFailedImages(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY) || ''}`
       },
       body: JSON.stringify({
         task_id: taskId,
@@ -643,6 +674,7 @@ export async function generateImagesPost(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY) || ''}`
       },
       body: JSON.stringify({
         pages,

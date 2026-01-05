@@ -1,10 +1,13 @@
 import logging
+import os
 import sys
 from pathlib import Path
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from backend.config import Config
 from backend.routes import register_routes
+from backend.admin import admin_bp
+from backend.middleware import setup_token_auth
 
 
 def setup_logging():
@@ -55,13 +58,25 @@ def create_app():
 
     app.config.from_object(Config)
 
+    # 设置 SECRET_KEY（用于 session 管理）
+    app.secret_key = os.environ.get('REDINK_SECRET_KEY', 'redink-secret-key-change-in-production')
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
     CORS(app, resources={
         r"/api/*": {
             "origins": Config.CORS_ORIGINS,
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type"],
+            "allow_headers": ["Content-Type", "Authorization", "X-Access-Token"],
         }
     })
+
+    # 注册管理面板路由
+    app.register_blueprint(admin_bp)
+    logger.info("📋 管理面板已启用: /admin")
+
+    # 设置 Token 认证中间件
+    setup_token_auth(app)
 
     # 注册所有 API 路由
     register_routes(app)

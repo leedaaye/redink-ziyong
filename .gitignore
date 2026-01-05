@@ -59,6 +59,9 @@ history/*
 /image_providers.yaml
 /text_providers.yaml
 
+# User data (contains tokens)
+backend/data/
+
 # Logs
 *.log
 logs/
@@ -79,3 +82,4 @@ debug_*.py
 DEV_NOTES.md
 commit_message.txt
 git-changelog.txt
+.ace-tool/

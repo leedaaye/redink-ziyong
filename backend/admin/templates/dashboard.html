@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}仪表盘 - 红墨管理后台{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>系统概览</h2>
+    <div class="stats">
+        <div class="stat-card">
+            <h3>用户总数</h3>
+            <div class="value">{{ user_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>快速操作</h2>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="{{ url_for('admin.users') }}" class="btn btn-primary">管理用户</a>
+        <a href="{{ url_for('admin.change_password') }}" class="btn btn-secondary">修改密码</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>使用说明</h2>
+    <div style="color: #666; line-height: 1.8;">
+        <p><strong>1. 用户管理</strong>：创建用户后，系统会生成一个访问令牌（Token），用户使用此令牌访问 API。</p>
+        <p><strong>2. 访问令牌</strong>：令牌仅在创建或重新生成时显示一次，请妥善保存。</p>
+        <p><strong>3. 前端配置</strong>：用户需要在前端登录页面输入访问令牌才能使用系统。</p>
+        <p><strong>4. 安全建议</strong>：请尽快修改默认管理员密码。</p>
+    </div>
+</div>
+{% endblock %}

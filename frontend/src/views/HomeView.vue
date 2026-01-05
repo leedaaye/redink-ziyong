@@ -27,19 +27,6 @@
       />
     </div>
 
-    <!-- 版权信息 -->
-    <div class="page-footer">
-      <div class="footer-tip">
-        配置不成功？访问 <a href="https://redink.top" target="_blank" rel="noopener noreferrer">redink.top</a> 官方站点即刻体验
-      </div>
-      <div class="footer-copyright">
-        © 2025 <a href="https://github.com/HisMax/RedInk" target="_blank" rel="noopener noreferrer">RedInk</a> by 默子 (Histone)
-      </div>
-      <div class="footer-license">
-        Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>
-      </div>
-    </div>
-
     <!-- 错误提示 -->
     <div v-if="error" class="error-toast">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
@@ -196,60 +183,6 @@ async function handleGenerate() {
   font-size: 16px;
   color: var(--text-sub);
   margin-top: 12px;
-}
-
-/* Page Footer */
-.page-footer {
-  text-align: center;
-  padding: 24px 0 16px;
-  margin-top: 20px;
-}
-
-.footer-copyright {
-  font-size: 15px;
-  color: #333;
-  font-weight: 500;
-  margin-bottom: 6px;
-}
-
-.footer-copyright a {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.footer-copyright a:hover {
-  text-decoration: underline;
-}
-
-.footer-license {
-  font-size: 13px;
-  color: #999;
-}
-
-.footer-license a {
-  color: #666;
-  text-decoration: none;
-}
-
-.footer-license a:hover {
-  color: var(--primary);
-}
-
-.footer-tip {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 12px;
-}
-
-.footer-tip a {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.footer-tip a:hover {
-  text-decoration: underline;
 }
 
 /* Error Toast */

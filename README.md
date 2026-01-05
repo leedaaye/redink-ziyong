@@ -2,421 +2,565 @@
 
 <img src="images/2.png" alt="红墨 - 灵感一触即发 让创作从未如此简单" width="600"/>
 
-## 红墨官方站点上线啦，注册即送50体验积分！
+# 红墨 RedInk
 
-## 注册需要邀请码！可以到 https://watcha.cn/square/discuss#post_id=1380 获取
+**AI 驱动的小红书图文生成器**
 
-<div align="center">
-<a href="https://redink.top">
-  <img src="images/redink.png" alt="红墨在线体验" width="500" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"/>
-</a>
-
-#### [点击访问在线体验站 → Redink.top](https://redink.top)
-
-
-</div>
-
-<img src="images/showcase-grid.png" alt="使用红墨生成的各类小红书封面" width="700" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);"/>
-
-<sub>*使用红墨生成的各类小红书封面 - AI驱动，风格统一，文字准确*</sub>
+输入一句话，自动生成完整的小红书图文内容
 
 </div>
 
 ---
 
-## ✨ 效果展示
+## 目录
 
-### 输入一句话，生成完整图文
-
-<details open>
-<summary><b>Step 1: 智能大纲生成</b></summary>
-
-<br>
-
-![大纲示例](./images/example-2.png)
-
-**功能特性：**
-- ✏️ 可编辑每页内容
-- 🔄 可调整页面顺序（不建议）
-- ✨ 自定义每页描述（强烈推荐）
-
-</details>
-
-<details open>
-<summary><b>🎨 Step 2: 封面页生成</b></summary>
-
-<br>
-
-![封面示例](./images/example-3.png)
-
-**封面亮点：**
-- 🎯 符合个人风格
-- 📝 文字准确无误
-- 🌈 视觉统一协调
-
-</details>
-
-<details open>
-<summary><b>📚 Step 3: 内容页批量生成</b></summary>
-
-<br>
-
-![内容页示例](./images/example-4.png)
-
-**生成说明：**
-- ⚡ 并发生成所有页面（默认最多 15 张）
-- ⚠️ 如 API 不支持高并发，请在设置中关闭
-- 🔧 支持单独重新生成不满意的页面
-
-</details>
+- [功能特性](#功能特性)
+- [技术架构](#技术架构)
+- [快速开始](#快速开始)
+  - [Windows 本地开发](#windows-本地开发)
+  - [macOS / Linux 本地开发](#macos--linux-本地开发)
+- [服务器部署](#服务器部署)
+  - [基础部署](#基础部署)
+  - [持久化运行](#持久化运行)
+  - [Nginx 反向代理](#nginx-反向代理)
+- [配置说明](#配置说明)
+- [用户认证系统](#用户认证系统)
+- [常见问题](#常见问题)
 
 ---
 
-## 🏗️ 技术架构
+## 功能特性
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
-### 🔧 后端技术栈
-
-| 技术 | 说明 |
-|------|------|
-| **语言** | Python 3.11+ |
-| **框架** | Flask |
-| **包管理** | uv |
-| **文案AI** | Gemini 3 |
-| **图片AI** | 🍌 Nano banana Pro |
-
-</td>
-<td width="50%" valign="top">
-
-### 🎨 前端技术栈
-
-| 技术 | 说明 |
-|------|------|
-| **框架** | Vue 3 + TypeScript |
-| **构建工具** | Vite |
-| **状态管理** | Pinia |
-| **样式** | Modern CSS |
-
-</td>
-</tr>
-</table>
+- **智能大纲生成**：输入主题，AI 自动生成多页内容大纲
+- **封面页生成**：生成符合小红书风格的精美封面
+- **内容页批量生成**：并发生成所有内页（支持高并发模式）
+- **文案生成**：自动生成标题、正文和标签
+- **历史记录**：保存所有生成记录，支持重新编辑
+- **用户认证**：Token 认证系统，支持多用户管理
 
 ---
 
-## 📦 如何自己部署
+## 技术架构
 
-### 方式一：Docker 部署（推荐）
+| 层级 | 技术栈 |
+|------|--------|
+| **前端** | Vue 3 + TypeScript + Vite + Pinia |
+| **后端** | Python 3.11+ + Flask |
+| **包管理** | uv (Python) / pnpm (Node.js) |
+| **文案 AI** | Google Gemini / OpenAI 兼容接口 |
+| **图片 AI** | Google Gemini / OpenAI 兼容接口 |
 
-**最简单的部署方式，一行命令即可启动：**
+---
+
+## 快速开始
+
+### 前置要求
+
+- **Python** 3.11+
+- **Node.js** 18+
+- **pnpm**（`npm install -g pnpm`）
+- **uv**（Python 包管理器）
+
+#### 安装 uv
 
 ```bash
-docker run -d -p 12398:12398 -v ./history:/app/history -v ./output:/app/output histonemax/redink:latest
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-访问 http://localhost:12398，在 Web 界面的**设置页面**配置你的 API Key 即可使用。
-
-**使用 docker-compose（可选）：**
-
-下载 [docker-compose.yml](https://github.com/HisMax/RedInk/blob/main/docker-compose.yml) 后：
-
-```bash
-docker-compose up -d
-```
-
-**Docker 部署说明：**
-- 容器内不包含任何 API Key，需要在 Web 界面配置
-- 使用 `-v ./history:/app/history` 持久化历史记录
-- 使用 `-v ./output:/app/output` 持久化生成的图片
-- 可选：挂载自定义配置文件 `-v ./text_providers.yaml:/app/text_providers.yaml`
-
 ---
 
-### 方式二：本地开发部署
+### Windows 本地开发
 
-**前置要求：**
-- Python 3.11+
-- Node.js 18+
-- pnpm
-- uv
+#### 方式一：一键启动（推荐）
 
-### 1. 克隆项目
-```bash
+1. 克隆项目
+```powershell
 git clone https://github.com/HisMax/RedInk.git
 cd RedInk
 ```
 
-### 2. 配置 API 服务
+2. 双击运行 `start.bat`
 
-复制配置模板文件：
-```bash
-cp text_providers.yaml.example text_providers.yaml
-cp image_providers.yaml.example image_providers.yaml
+脚本会自动：
+- 检查并安装 Python 依赖
+- 检查并安装前端依赖
+- 启动后端服务（端口 12398）
+- 启动前端开发服务器（端口 5173）
+- 自动打开浏览器
+
+#### 方式二：手动启动
+
+1. **克隆项目**
+```powershell
+git clone https://github.com/HisMax/RedInk.git
+cd RedInk
 ```
 
-编辑配置文件，填入你的 API Key 和服务配置。也可以启动后在 Web 界面的**设置页面**进行配置。
-
-### 3. 安装后端依赖
-```bash
+2. **安装后端依赖**
+```powershell
 uv sync
 ```
 
-### 4. 安装前端依赖
-```bash
+3. **安装前端依赖**
+```powershell
 cd frontend
 pnpm install
+cd ..
 ```
 
-### 5. 启动服务
-
-#### 一键启动（推荐）
-
-双击运行启动脚本，自动安装依赖并启动前后端：
-
-- **macOS**: `start.sh` 或双击 `scripts/start-macos.command`
-- **Linux**: `./start.sh`
-- **Windows**: 双击 `start.bat`
-
-启动后自动打开浏览器访问 http://localhost:5173
-
-#### 手动启动
-
-**启动后端:**
-```bash
+4. **启动后端**（新开一个终端）
+```powershell
 uv run python -m backend.app
 ```
-访问: http://localhost:12398
+后端运行在：http://localhost:12398
 
-**启动前端:**
-```bash
+5. **启动前端**（新开一个终端）
+```powershell
 cd frontend
 pnpm dev
 ```
-访问: http://localhost:5173
+前端运行在：http://localhost:5173
+
+6. **访问应用**
+
+打开浏览器访问 http://localhost:5173
 
 ---
 
-## 🔧 配置说明
+### macOS / Linux 本地开发
+
+#### 方式一：一键启动
+
+```bash
+git clone https://github.com/HisMax/RedInk.git
+cd RedInk
+chmod +x start.sh
+./start.sh
+```
+
+#### 方式二：手动启动
+
+```bash
+# 克隆项目
+git clone https://github.com/HisMax/RedInk.git
+cd RedInk
+
+# 安装后端依赖
+uv sync
+
+# 安装前端依赖
+cd frontend && pnpm install && cd ..
+
+# 启动后端（终端 1）
+uv run python -m backend.app
+
+# 启动前端（终端 2）
+cd frontend && pnpm dev
+```
+
+---
+
+## 服务器部署
+
+### 基础部署
+
+以 Ubuntu/Debian 服务器为例：
+
+#### 1. 安装系统依赖
+
+```bash
+# 更新系统
+sudo apt update && sudo apt upgrade -y
+
+# 安装 Python 3.11+
+sudo apt install python3.11 python3.11-venv -y
+
+# 安装 Node.js 18+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install nodejs -y
+
+# 安装 pnpm
+npm install -g pnpm
+
+# 安装 uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.bashrc
+```
+
+#### 2. 克隆项目
+
+```bash
+cd /opt
+sudo git clone https://github.com/HisMax/RedInk.git
+sudo chown -R $USER:$USER RedInk
+cd RedInk
+```
+
+#### 3. 安装依赖
+
+```bash
+# 后端依赖
+uv sync
+
+# 前端依赖并构建
+cd frontend
+pnpm install
+pnpm build
+cd ..
+```
+
+#### 4. 配置 API
+
+编辑配置文件，填入你的 API Key：
+
+```bash
+# 文本生成配置
+nano text_providers.yaml
+
+# 图片生成配置
+nano image_providers.yaml
+```
+
+#### 5. 测试运行
+
+```bash
+uv run python -m backend.app
+```
+
+访问 `http://服务器IP:12398` 验证是否正常运行。
+
+---
+
+### 持久化运行
+
+#### 方式一：Systemd（推荐）
+
+1. **创建服务文件**
+
+```bash
+sudo nano /etc/systemd/system/redink.service
+```
+
+写入以下内容：
+
+```ini
+[Unit]
+Description=RedInk AI Image Generator
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/RedInk
+Environment="PATH=/home/ubuntu/.local/bin:/usr/local/bin:/usr/bin"
+ExecStart=/home/ubuntu/.local/bin/uv run python -m backend.app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+> 注意：将 `/home/ubuntu/.local/bin` 替换为你的 uv 安装路径（运行 `which uv` 查看）
+
+2. **设置目录权限**
+
+```bash
+sudo chown -R www-data:www-data /opt/RedInk
+```
+
+3. **启动服务**
+
+```bash
+# 重载 systemd 配置
+sudo systemctl daemon-reload
+
+# 启动服务
+sudo systemctl start redink
+
+# 设置开机自启
+sudo systemctl enable redink
+
+# 查看状态
+sudo systemctl status redink
+
+# 查看日志
+sudo journalctl -u redink -f
+```
+
+4. **常用命令**
+
+```bash
+# 停止服务
+sudo systemctl stop redink
+
+# 重启服务
+sudo systemctl restart redink
+
+# 禁用开机自启
+sudo systemctl disable redink
+```
+
+#### 方式二：PM2
+
+1. **安装 PM2**
+
+```bash
+npm install -g pm2
+```
+
+2. **创建启动脚本**
+
+```bash
+nano /opt/RedInk/start-pm2.sh
+```
+
+写入：
+
+```bash
+#!/bin/bash
+cd /opt/RedInk
+/home/ubuntu/.local/bin/uv run python -m backend.app
+```
+
+3. **启动服务**
+
+```bash
+chmod +x /opt/RedInk/start-pm2.sh
+pm2 start /opt/RedInk/start-pm2.sh --name redink
+pm2 save
+pm2 startup
+```
+
+4. **常用命令**
+
+```bash
+pm2 status          # 查看状态
+pm2 logs redink     # 查看日志
+pm2 restart redink  # 重启
+pm2 stop redink     # 停止
+```
+
+#### 方式三：Screen（临时方案）
+
+```bash
+# 创建 screen 会话
+screen -S redink
+
+# 启动服务
+cd /opt/RedInk
+uv run python -m backend.app
+
+# 按 Ctrl+A 然后按 D 分离会话
+
+# 重新连接会话
+screen -r redink
+```
+
+---
+
+### Nginx 反向代理
+
+#### 1. 安装 Nginx
+
+```bash
+sudo apt install nginx -y
+```
+
+#### 2. 创建配置文件
+
+```bash
+sudo nano /etc/nginx/sites-available/redink
+```
+
+写入：
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;  # 替换为你的域名
+
+    # 前端静态文件和 API 代理
+    location / {
+        proxy_pass http://127.0.0.1:12398;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+
+        # SSE 支持（用于流式生成）
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }
+
+    # 上传文件大小限制
+    client_max_body_size 50M;
+}
+```
+
+#### 3. 启用配置
+
+```bash
+sudo ln -s /etc/nginx/sites-available/redink /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+#### 4. 配置 HTTPS（可选但推荐）
+
+```bash
+# 安装 Certbot
+sudo apt install certbot python3-certbot-nginx -y
+
+# 获取证书
+sudo certbot --nginx -d your-domain.com
+
+# 自动续期测试
+sudo certbot renew --dry-run
+```
+
+---
+
+## 配置说明
 
 ### 配置方式
 
-项目支持两种配置方式：
-
-1. **Web 界面配置（推荐）**：启动服务后，在设置页面可视化配置
+1. **Web 界面配置**（推荐）：启动后在设置页面可视化配置
 2. **YAML 文件配置**：直接编辑配置文件
 
 ### 文本生成配置
 
-配置文件: `text_providers.yaml`
+文件：`text_providers.yaml`
 
 ```yaml
-# 当前激活的服务商
-active_provider: openai
+active_provider: gemini
 
 providers:
-  # OpenAI 官方或兼容接口
+  gemini:
+    type: google_gemini
+    api_key: AIzaxxxxxxxxxxxxxxxxxxxxxxxxx
+    model: gemini-2.0-flash
+
   openai:
     type: openai_compatible
     api_key: sk-xxxxxxxxxxxxxxxxxxxx
     base_url: https://api.openai.com/v1
     model: gpt-4o
-
-  # Google Gemini（原生接口）
-  gemini:
-    type: google_gemini
-    api_key: AIzaxxxxxxxxxxxxxxxxxxxxxxxxx
-    model: gemini-2.0-flash
 ```
 
 ### 图片生成配置
 
-配置文件: `image_providers.yaml`
+文件：`image_providers.yaml`
 
 ```yaml
-# 当前激活的服务商
 active_provider: gemini
 
 providers:
-  # Google Gemini 图片生成
   gemini:
     type: google_genai
     api_key: AIzaxxxxxxxxxxxxxxxxxxxxxxxxx
     model: gemini-3-pro-image-preview
-    high_concurrency: false  # 高并发模式
-
-  # OpenAI 兼容接口
-  openai_image:
-    type: image_api
-    api_key: sk-xxxxxxxxxxxxxxxxxxxx
-    base_url: https://your-api-endpoint.com
-    model: dall-e-3
     high_concurrency: false
 ```
 
-### 高并发模式说明
+### 高并发模式
 
-- **关闭（默认）**：图片逐张生成，适合 GCP 300$ 试用账号或有速率限制的 API
-- **开启**：图片并行生成（最多15张同时），速度更快，但需要 API 支持高并发
-
-⚠️ **GCP 300$ 试用账号不建议启用高并发**，可能会触发速率限制导致生成失败。
+- **关闭（默认）**：图片逐张生成，适合有速率限制的 API
+- **开启**：图片并行生成（最多 15 张），需要 API 支持高并发
 
 ---
 
-## ⚠️ 注意事项
+## 用户认证系统
 
-1. **API 配额限制**:
-   - 注意 Gemini 和图片生成 API 的调用配额
-   - GCP 试用账号建议关闭高并发模式
+### 管理员面板
 
-2. **生成时间**:
-   - 图片生成需要时间,请耐心等待（不要离开页面）
+访问 `/admin` 进入管理面板（默认密码：`redink2025`）
 
----
+功能：
+- 创建/删除用户
+- 查看用户 Token
+- 查看用户最后使用时间
 
-## 🤝 参与贡献
+### 用户登录
 
-欢迎提交 Issue 和 Pull Request!
+1. 管理员在面板创建用户，获取 Token
+2. 用户使用 Token 登录前端
 
-如果这个项目对你有帮助,欢迎给个 Star ⭐
+### 数据存储
 
+用户数据存储在 `backend/data/users.json`
 
----
+### 环境变量
 
-## 更新日志
+```bash
+# 管理员密码（可选，默认 redink2025）
+export REDINK_ADMIN_PASSWORD=your-secure-password
 
-### v1.4.1 (2025-12-29)
-- ✨ 新增一键启动脚本，支持 macOS/Linux/Windows
-- ✨ 新增文案生成功能，自动生成标题、正文和标签
-- 🔧 修复历史记录保存机制：大纲生成后立即保存，编辑时自动保存（300ms防抖）
-- 🔧 优化跳转逻辑：点击"开始生成"前强制保存未保存的修改
-- 🔧 统一启动脚本端口显示为 12398
-- 🔧 清理后端生成器未使用的重试装饰器代码
-- 🔧 修复前端 CSS 变量引用问题
-- 🔧 优化 checkHistoryExists 接口性能，使用专用端点
-- 🔧 规范 recordId 赋值方式，统一使用 setRecordId() 方法
-
-### v1.4.0 (2025-11-30)
-- 🏗️ 后端架构重构：拆分单体路由为模块化蓝图（history、images、generation、outline、config）
-- 🏗️ 前端组件重构：提取可复用组件（ImageGalleryModal、OutlineModal、ShowcaseBackground等）
-- ✨ 优化首页设计，移除冗余内容区块
-- ✨ 背景图片预加载和渐入动画，提升加载体验
-- ✨ 历史记录持久化支持（Docker部署）
-- 🔧 修复历史记录预览和大纲查看功能
-- 🔧 优化Modal组件可见性控制
-- 🧪 新增65个后端单元测试
-
-### v1.3.0 (2025-11-26)
-- ✨ 新增 Docker 支持，一键部署
-- ✨ 发布官方 Docker 镜像到 Docker Hub: `histonemax/redink`
-- 🔧 Flask 自动检测前端构建产物，支持单容器部署
-- 🔧 Docker 镜像内置空白配置模板，保护 API Key 安全
-- 📝 更新 README，添加 Docker 部署说明
-
-### v1.2.0 (2025-11-26)
-- ✨ 新增版权信息展示，所有页面显示开源协议和项目链接
-- ✨ 优化图片重新生成功能，支持单张图片重绘
-- ✨ 重新生成图片时保持风格一致，传递完整上下文（封面图、大纲、用户输入）
-- ✨ 修复图片缓存问题，重新生成的图片立即刷新显示
-- ✨ 统一文本生成客户端接口，支持 Google Gemini 和 OpenAI 兼容接口自动切换
-- ✨ 新增 Web 界面配置功能，可视化管理 API 服务商
-- ✨ 新增高并发模式开关，适配不同 API 配额
-- ✨ API Key 脱敏显示，保护密钥安全
-- ✨ 配置自动保存，修改即时生效
-- 🔧 调整默认 max_output_tokens 为 8000，兼容更多模型限制
-- 🔧 优化前端路由和页面布局，提升用户体验
-- 🔧 简化配置文件结构，移除冗余参数
-- 🔧 优化历史记录图片显示，使用缩略图节省带宽
-- 🔧 历史记录重新生成时自动从文件系统加载封面图作为参考
-- 🐛 修复 `store.updateImage` 方法缺失导致的重新生成失败问题
-- 🐛 修复历史记录加载时图片 URL 拼接错误
-- 🐛 修复下载功能中原图参数处理问题
-- 🐛 修复图片加载 500 错误问题
+# Session 密钥（生产环境必须修改）
+export REDINK_SECRET_KEY=your-random-secret-key
+```
 
 ---
 
-## 交流讨论与赞助
+## 常见问题
 
-- **GitHub Issues**: [https://github.com/HisMax/RedInk/issues](https://github.com/HisMax/RedInk/issues)
+### Q: 端口被占用怎么办？
 
-### 联系作者
+修改 `backend/config.py` 中的 `PORT` 配置：
+
+```python
+PORT = 12399  # 改为其他端口
+```
+
+### Q: API 调用失败？
+
+1. 检查 API Key 是否正确
+2. 检查网络是否能访问 API 服务
+3. 查看后端日志获取详细错误信息
+
+### Q: 图片生成很慢？
+
+1. 检查网络连接
+2. 如果 API 支持，可以开启高并发模式
+3. GCP 试用账号不建议开启高并发
+
+### Q: 如何备份数据？
+
+需要备份的目录：
+- `history/` - 历史记录
+- `backend/data/` - 用户数据
+- `text_providers.yaml` - 文本配置
+- `image_providers.yaml` - 图片配置
+
+---
+
+## 开源协议
+
+本项目采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 协议
+
+- ✅ 个人使用、学习、研究
+- ✅ 分享和修改（需署名、相同协议）
+- ❌ 商业用途（需联系作者获取授权）
+
+商业授权联系：histonemax@gmail.com
+
+---
+
+## 联系作者
 
 - **Email**: histonemax@gmail.com
-- **微信**: Histone2024（添加请注明来意）
+- **微信**: Histone2024
 - **GitHub**: [@HisMax](https://github.com/HisMax)
 
-### 用爱发电，如果可以，请默子喝一杯☕️咖啡吧
-
-<img src="images/coffee.jpg" alt="赞赏码" width="300"/>
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=HisMax/RedInk&type=Date)](https://star-history.com/#HisMax/RedInk&Date)
-
 ---
 
-## 📄 开源协议
-
-### 个人使用 - CC BY-NC-SA 4.0
-
-本项目采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 协议进行开源
-
-**你可以自由地：**
-- ✅ **个人使用** - 用于学习、研究、个人项目
-- ✅ **分享** - 在任何媒介以任何形式复制、发行本作品
-- ✅ **修改** - 修改、转换或以本作品为基础进行创作
-
-**但需要遵守以下条款：**
-- 📝 **署名** - 必须给出适当的署名，提供指向本协议的链接，同时标明是否对原始作品作了修改
-- 🚫 **非商业性使用** - 不得将本作品用于商业目的
-- 🔄 **相同方式共享** - 如果你修改、转换或以本作品为基础进行创作，你必须以相同的协议分发你的作品
-
-### 商业授权
-
-如果你希望将本项目用于**商业目的**（包括但不限于）：
-- 提供付费服务
-- 集成到商业产品
-- 作为 SaaS 服务运营
-- 其他盈利性用途
-
-**请联系作者获取商业授权：**
-- 📧 Email: histonemax@gmail.com
-- 💬 微信: Histone2024（请注明"商业授权咨询"）
-
-默子会根据你的具体使用场景提供灵活的商业授权方案。
-
----
-
-### 免责声明
-
-本软件按"原样"提供，不提供任何形式的明示或暗示担保，包括但不限于适销性、特定用途的适用性和非侵权性的担保。在任何情况下，作者或版权持有人均不对任何索赔、损害或其他责任负责。
-
----
-
-## 🙏 致谢
-
-- [Google Gemini](https://ai.google.dev/) - 强大的文案生成能力
-- 图片生成服务提供商 - 惊艳的图片生成效果
-- [Linux.do](https://linux.do/) - 优秀的开发者社区
-
----
-
-## 👨‍💻 作者
-
-**默子 (Histone)** - AI 创业者 
-
-- 🏠 位置: 中国杭州
-- 🚀 状态: 创业中
-- 📧 Email: histonemax@gmail.com
-- 💬 微信: Histone2024 （私人微信不解答任何技术问题）
-- 🐙 GitHub: [@HisMax](https://github.com/HisMax)
-- 
-
-*"让 AI 帮我们做更有创造力的事"*
-
----
-
-**如果这个项目帮到了你,欢迎分享给更多人!** ⭐
-
-有任何问题或建议,欢迎提 Issue !
+**如果这个项目帮到了你，欢迎给个 Star ⭐**

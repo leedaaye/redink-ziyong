@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}用户管理 - 红墨管理后台{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>添加用户</h2>
+    <form method="POST" action="{{ url_for('admin.add_user') }}" style="display: flex; gap: 12px; align-items: flex-end;">
+        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <label for="username">用户名</label>
+            <input type="text" id="username" name="username" placeholder="输入用户名" required style="margin-bottom: 0;">
+        </div>
+        <button type="submit" class="btn btn-primary">添加用户</button>
+    </form>
+</div>
+
+<div class="card">
+    <h2>用户列表</h2>
+    {% if users %}
+    <table>
+        <thead>
+            <tr>
+                <th>用户名</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>最后使用</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>
+                    {% if user.enabled %}
+                    <span class="badge badge-success">启用</span>
+                    {% else %}
+                    <span class="badge badge-danger">禁用</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.created_at[:10] if user.created_at else '-' }}</td>
+                <td>{{ user.last_used[:10] if user.last_used else '从未使用' }}</td>
+                <td>
+                    <div class="actions">
+                        <form method="POST" action="{{ url_for('admin.toggle_user', user_id=user.id) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-secondary">
+                                {{ '禁用' if user.enabled else '启用' }}
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin.regenerate_token', user_id=user.id) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-secondary" onclick="return confirm('确定要重新生成 Token 吗？旧 Token 将立即失效。')">
+                                重置Token
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="showToken('{{ user.id }}')">
+                            查看Token
+                        </button>
+                        <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除用户 {{ user.username }} 吗？此操作不可恢复。')">
+                                删除
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #666; text-align: center; padding: 40px;">暂无用户，请添加第一个用户</p>
+    {% endif %}
+</div>
+
+<!-- Token 显示弹窗 -->
+<div id="tokenModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 24px; border-radius: 12px; max-width: 500px; width: 90%;">
+        <h3 style="margin-bottom: 16px;">访问令牌</h3>
+        <div id="tokenDisplay" class="token-display" style="margin-bottom: 16px;"></div>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="copyToken()" class="btn btn-primary">复制</button>
+            <button onclick="closeModal()" class="btn btn-secondary">关闭</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentToken = '';
+
+function showToken(userId) {
+    fetch('/admin/api/users/' + userId + '/token')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                currentToken = data.token;
+                document.getElementById('tokenDisplay').textContent = data.token;
+                document.getElementById('tokenModal').style.display = 'flex';
+            } else {
+                alert('获取 Token 失败');
+            }
+        });
+}
+
+function copyToken() {
+    navigator.clipboard.writeText(currentToken).then(() => {
+        alert('Token 已复制到剪贴板');
+    });
+}
+
+function closeModal() {
+    document.getElementById('tokenModal').style.display = 'none';
+}
+
+document.getElementById('tokenModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+</script>
+{% endblock %}
